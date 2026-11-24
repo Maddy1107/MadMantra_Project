@@ -3757,31 +3757,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.5
+      value: -4.78
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 1.45
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.2
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3789,7 +3789,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -3809,6 +3809,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2798070245575133532, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
   m_PrefabInstance: {fileID: 1411188827957165851}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1411188827957165856 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9100000000000000002, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
+  m_PrefabInstance: {fileID: 1411188827957165851}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1411188827957165855 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7760297647212221507, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
@@ -3817,9 +3822,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22416193c135b704f955b1326117307d, type: 3}
+  m_Script: {fileID: 11500000, guid: 4f47c7daecad43c4ca9e88c2d03f528f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Cabinet
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
 --- !u!1001 &2879908989450367777
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3901,6 +3906,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7760734640211435628, guid: f67d637bb4e30e34e87bf0cf63aaa16f, type: 3}
+      propertyPath: solvedFocusPoint
+      value: 
+      objectReference: {fileID: 1411188827957165856}
+    - target: {fileID: 7760734640211435628, guid: f67d637bb4e30e34e87bf0cf63aaa16f, type: 3}
       propertyPath: onSolved.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3918,11 +3927,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7760734640211435628, guid: f67d637bb4e30e34e87bf0cf63aaa16f, type: 3}
       propertyPath: onSolved.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Open
+      value: OpenDoor
       objectReference: {fileID: 0}
     - target: {fileID: 7760734640211435628, guid: f67d637bb4e30e34e87bf0cf63aaa16f, type: 3}
       propertyPath: onSolved.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: MadMantra.Environment.Cabinet, Assembly-CSharp
+      value: MadMantra.Environment.Door, Assembly-CSharp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

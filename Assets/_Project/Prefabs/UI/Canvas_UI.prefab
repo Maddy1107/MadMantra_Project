@@ -675,6 +675,9 @@ MonoBehaviour:
   objectivePanel: {fileID: 7973411494558990474}
   objectiveText: {fileID: 1999619547896979645}
   puzzleHintPanel: {fileID: 8783721938771246139}
+  keyBadge: {fileID: 5103219424194449722}
+  feedbackPanel: {fileID: 2457988874761872752}
+  feedbackText: {fileID: 8323964393692036108}
 --- !u!1 &4755501559088118954
 GameObject:
   m_ObjectHideFlags: 0

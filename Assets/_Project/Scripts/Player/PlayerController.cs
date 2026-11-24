@@ -25,6 +25,7 @@ namespace MadMantra.Player
         private float verticalVelocity;
         private Vector3 savedMountPos;
         private Quaternion savedMountRot;
+        private bool inFocus;
         private Coroutine focusRoutine;
 
         public bool CanMove { get; set; } = true;
@@ -106,13 +107,14 @@ namespace MadMantra.Player
         {
             if (cameraMount == null) return;
             bool enter = target != null;
-            if (enter)
+            if (enter && !inFocus)
             {
                 savedMountPos = cameraMount.localPosition;
                 savedMountRot = cameraMount.localRotation;
                 CanMove = CanLook = false;
                 SetCursorLocked(false);
             }
+            inFocus = enter;
 
             Vector3 toPos = enter ? cameraMount.parent.InverseTransformPoint(target.position) : savedMountPos;
             Quaternion toRot = enter ? Quaternion.Inverse(cameraMount.parent.rotation) * target.rotation : savedMountRot;

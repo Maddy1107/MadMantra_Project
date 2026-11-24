@@ -14,9 +14,11 @@ namespace MadMantra.Puzzle
         [SerializeField] private PuzzleButton[] puzzleButtons = new PuzzleButton[3];
         [SerializeField] private int[] code = { 0, 1, 2 };
         [SerializeField] private Transform cameraFocusPoint;
+        [SerializeField] private Transform solvedFocusPoint;
+        [SerializeField] private float solvedFocusDuration = 1.4f;
         [SerializeField] private UnityEvent onSolved;
 
-        private Action exitFocus;
+        private Action<Transform, Action> setFocus;
         private Camera focusCam;
         private Queue<int> remaining;
         private bool busy;
@@ -34,10 +36,10 @@ namespace MadMantra.Puzzle
             if (IsSolved || IsInPuzzleView || busy) return;
             busy = true;
             focusCam = interactor.ActiveCamera;
+            setFocus = interactor.SetFocus;
             UIManager.Instance?.HidePrompt();
             UIManager.Instance?.SetCrosshair(false);
-            exitFocus = () => interactor.SetFocus(null, () => UIManager.Instance?.SetCrosshair(true));
-            interactor.SetFocus(cameraFocusPoint, () => { IsInPuzzleView = true; busy = false; UIManager.Instance?.SetPuzzleHint(true); });
+            setFocus(cameraFocusPoint, () => { IsInPuzzleView = true; busy = false; UIManager.Instance?.SetPuzzleHint(true); });
         }
 
         private void Update()
@@ -81,10 +83,20 @@ namespace MadMantra.Puzzle
         private IEnumerator SolveRoutine()
         {
             IsSolved = true;
-            Debug.Log("[ControlPanel] Puzzle solved!");
             foreach (var b in puzzleButtons) b.SetSolvedState();
+            UIManager.Instance?.SetPuzzleHint(false);
+
+            yield return new WaitForSeconds(0.3f);
+
+            if (solvedFocusPoint != null && setFocus != null)
+            {
+                bool arrived = false;
+                setFocus(solvedFocusPoint, () => arrived = true);
+                yield return new WaitUntil(() => arrived);
+            }
+
             onSolved?.Invoke();
-            yield return new WaitForSeconds(0.45f);
+            yield return new WaitForSeconds(solvedFocusDuration);
             LeavePanel();
         }
 
@@ -93,7 +105,7 @@ namespace MadMantra.Puzzle
             if (!IsInPuzzleView) return;
             IsInPuzzleView = false;
             UIManager.Instance?.SetPuzzleHint(false);
-            exitFocus?.Invoke();
+            setFocus?.Invoke(null, () => UIManager.Instance?.SetCrosshair(true));
         }
     }
 }

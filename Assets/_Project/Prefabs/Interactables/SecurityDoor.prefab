@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 1092700265088563294}
   - component: {fileID: 6176201685751311249}
   - component: {fileID: 828010158377410851}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DoorPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -345,8 +345,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5505832479652551146}
-  - component: {fileID: 2052505230832869431}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SecurityDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,24 +377,20 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2618239996112236840}
+  m_GameObject: {fileID: 3784959895264229167}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47c059b05c582d148b35beccfd1aafb0, type: 3}
+  m_Script: {fileID: 11500000, guid: 4f47c7daecad43c4ca9e88c2d03f528f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.DoorController
-  interactionPrompt: Press [E] to interact
-  canInteract: 1
-  highlightRenderer: {fileID: 828010158377410851}
-  highlightColor: {r: 1.2, g: 1.2, b: 1.2, a: 1}
-  doorId: Door_Room1_To_Room2
-  doorName: Security Bulkhead
-  isLocked: 1
-  requiredKeyId: Key_Room2
-  doorHingeTransform: {fileID: 220990958435711526}
-  openEulerOffset: {x: 0, y: -95, z: 0}
-  animationDuration: 1
-  isOpen: 0
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
+  openAngle: -90
+  openDuration: 0.9
+  lockMode: 1
+  canClose: 0
+  lockedMessage: Locked - Security Keycard Required
+  onOpened:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3784959895264229167
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,7 +400,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 220990958435711526}
-  m_Layer: 0
+  - component: {fileID: 2052505230832869431}
+  m_Layer: 6
   m_Name: Hinge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -441,7 +437,7 @@ GameObject:
   - component: {fileID: 3497787335972895300}
   - component: {fileID: 4419475132271978214}
   - component: {fileID: 5605048863881717209}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
