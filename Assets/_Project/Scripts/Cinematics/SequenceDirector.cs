@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using MadMantra.Player;
 using MadMantra.Environment;
+using MadMantra.UI;
 
 namespace MadMantra.Cinematics
 {
@@ -39,6 +40,9 @@ namespace MadMantra.Cinematics
         [SerializeField] private float doorOpenAngle = -90f;
         [SerializeField] private float doorCloseDuration = 0.6f;
 
+        [Header("Debug")]
+        [SerializeField] private bool skipWakeUp = true;
+
         [Header("References")]
         [SerializeField] private PlayerController player;
         [SerializeField] private LightFlicker[] flickerLights;
@@ -53,10 +57,19 @@ namespace MadMantra.Cinematics
 
         private void Start()
         {
-            if (player != null)
+            if (player == null) return;
+
+            if (skipWakeUp)
             {
-                StartCoroutine(WakeUpRoutine());
+                eyelids.SetOpenness(1f);
+                player.CanMove = true;
+                player.CanLook = true;
+                UIManager.Instance?.SetCrosshair(true);
+                UIManager.Instance?.SetObjective("Inspect the room and access the control panel.");
+                return;
             }
+
+            StartCoroutine(WakeUpRoutine());
         }
 
         private IEnumerator WakeUpRoutine()
@@ -157,6 +170,8 @@ namespace MadMantra.Cinematics
 
             player.CanMove = true;
             player.CanLook = true;
+            UIManager.Instance?.SetCrosshair(true);
+            UIManager.Instance?.SetObjective("Inspect the room and access the control panel.");
         }
     }
 }

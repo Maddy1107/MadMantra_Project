@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 namespace MadMantra.Player
@@ -21,6 +23,9 @@ namespace MadMantra.Player
         private CharacterController controller;
         private float pitch;
         private float verticalVelocity;
+        private Vector3 savedMountPos;
+        private Quaternion savedMountRot;
+        private Coroutine focusRoutine;
 
         public bool CanMove { get; set; } = true;
         public bool CanLook { get; set; } = true;
@@ -95,6 +100,39 @@ namespace MadMantra.Player
             moveDirection.y = verticalVelocity;
 
             controller.Move(moveDirection * Time.deltaTime);
+        }
+
+        public void SetFocus(Transform target, Action onDone = null)
+        {
+            if (cameraMount == null) return;
+            bool enter = target != null;
+            if (enter)
+            {
+                savedMountPos = cameraMount.localPosition;
+                savedMountRot = cameraMount.localRotation;
+                CanMove = CanLook = false;
+                SetCursorLocked(false);
+            }
+
+            Vector3 toPos = enter ? cameraMount.parent.InverseTransformPoint(target.position) : savedMountPos;
+            Quaternion toRot = enter ? Quaternion.Inverse(cameraMount.parent.rotation) * target.rotation : savedMountRot;
+            if (focusRoutine != null) StopCoroutine(focusRoutine);
+            focusRoutine = StartCoroutine(BlendCamera(toPos, toRot, !enter, onDone));
+        }
+
+        private IEnumerator BlendCamera(Vector3 toPos, Quaternion toRot, bool restoreControl, Action onDone)
+        {
+            Vector3 fromPos = cameraMount.localPosition;
+            Quaternion fromRot = cameraMount.localRotation;
+            for (float t = 0f; t < 1f; t += Time.deltaTime / 0.45f)
+            {
+                float s = Mathf.SmoothStep(0f, 1f, t);
+                cameraMount.SetLocalPositionAndRotation(Vector3.Lerp(fromPos, toPos, s), Quaternion.Slerp(fromRot, toRot, s));
+                yield return null;
+            }
+            cameraMount.SetLocalPositionAndRotation(toPos, toRot);
+            if (restoreControl) { SetCursorLocked(true); CanMove = CanLook = true; }
+            onDone?.Invoke();
         }
 
         public void SetCursorLocked(bool locked)

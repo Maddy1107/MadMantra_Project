@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using MadMantra.Interaction;
+using MadMantra.UI;
 
 namespace MadMantra.Player
 {
@@ -14,33 +16,34 @@ namespace MadMantra.Player
         private void Awake()
         {
             player = GetComponent<PlayerController>();
-
-            // If no mask is set in Inspector, default to the "Interactable" layer
-            if (interactMask.value == 0)
-            {
-                int layer = LayerMask.NameToLayer("Interactable");
-                interactMask = (layer != -1) ? (1 << layer) : ~0;
-            }
         }
 
         private void Update()
         {
+            if (player != null && !player.CanLook)
+            {
+                if (currentTarget != null) { currentTarget = null; UIManager.Instance?.HidePrompt(); }
+                return;
+            }
+
             CheckRaycast();
+
+            if (currentTarget != null) UIManager.Instance?.ShowPrompt(currentTarget.GetPrompt());
+            else UIManager.Instance?.HidePrompt();
 
             if (Input.GetKeyDown(KeyCode.E) && currentTarget != null)
             {
-                if (player != null && player.Hand != null)
-                {
-                    player.Hand.PlayInteractAnimation();
-                }
-
                 currentTarget.Interact(this);
             }
         }
 
+        public Camera ActiveCamera => player != null && player.PlayerCamera != null ? player.PlayerCamera : (GetComponent<Camera>() ?? Camera.main);
+        public void SetFocus(Transform target, Action onDone = null) => player?.SetFocus(target, onDone);
+        public void PlayHandInteract() => player?.Hand?.PlayInteractAnimation();
+
         private void CheckRaycast()
         {
-            Camera cam = player != null ? player.PlayerCamera : Camera.main;
+            Camera cam = ActiveCamera;
             if (cam == null) return;
 
             // Cast ray from center of screen (0.5, 0.5)
