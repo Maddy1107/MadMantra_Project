@@ -26,6 +26,11 @@ namespace MadMantra.Player
             }
         }
 
+        public void SetPoseOffset(Vector3 offset)
+        {
+            transform.localPosition = restPosition + offset;
+        }
+
         public void PlayInteractAnimation()
         {
             StopAllCoroutines();

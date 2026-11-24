@@ -75,19 +75,21 @@ namespace MadMantra.Player
 
         private void HandleMovement()
         {
+            if (!CanMove)
+            {
+                verticalVelocity = -2f;
+                controller.Move(Vector3.down * 0.05f * Time.deltaTime);
+                return;
+            }
+
             if (controller.isGrounded && verticalVelocity < 0f)
             {
                 verticalVelocity = -2f;
             }
 
-            Vector3 moveDirection = Vector3.zero;
-
-            if (CanMove)
-            {
-                float moveX = Input.GetAxis("Horizontal");
-                float moveZ = Input.GetAxis("Vertical");
-                moveDirection = (transform.right * moveX + transform.forward * moveZ).normalized * walkSpeed;
-            }
+            float moveX = Input.GetAxis("Horizontal");
+            float moveZ = Input.GetAxis("Vertical");
+            Vector3 moveDirection = (transform.right * moveX + transform.forward * moveZ).normalized * walkSpeed;
 
             verticalVelocity += gravity * Time.deltaTime;
             moveDirection.y = verticalVelocity;
