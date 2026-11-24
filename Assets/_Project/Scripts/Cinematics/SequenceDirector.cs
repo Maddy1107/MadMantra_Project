@@ -10,19 +10,7 @@ namespace MadMantra.Cinematics
     {
         public static SequenceDirector Instance { get; private set; }
 
-        // Groggy wake-up blinks: (target openness, seconds to reach it)
-        private static readonly Vector2[] BlinkKeys =
-        {
-            new Vector2(0f, 1.2f),   // still unconscious
-            new Vector2(0.35f, 0.8f),
-            new Vector2(0f, 0.3f),
-            new Vector2(0f, 0.5f),
-            new Vector2(0.7f, 0.6f),
-            new Vector2(0.1f, 0.2f),
-            new Vector2(1f, 0.7f),
-        };
-
-        [Header("Face-Down Pose")]
+        [Header("Pose")]
         [SerializeField] private Vector3 lyingCameraOffset = new Vector3(0f, -1.45f, 0.15f);
         [SerializeField] private Vector3 lyingHandOffset = new Vector3(-0.15f, 0.24f, -0.12f);
         [SerializeField] private float headDownPitch = 40f;
@@ -45,15 +33,10 @@ namespace MadMantra.Cinematics
 
         [Header("References")]
         [SerializeField] private PlayerController player;
+        [SerializeField] private EyelidOverlay eyelids;
         [SerializeField] private LightFlicker[] flickerLights;
 
-        private EyelidOverlay eyelids;
-
-        private void Awake()
-        {
-            Instance = this;
-            eyelids = gameObject.AddComponent<EyelidOverlay>();
-        }
+        private void Awake() => Instance = this;
 
         private void Start()
         {
@@ -61,11 +44,8 @@ namespace MadMantra.Cinematics
 
             if (skipWakeUp)
             {
-                eyelids.SetOpenness(1f);
-                player.CanMove = true;
-                player.CanLook = true;
-                UIManager.Instance?.SetCrosshair(true);
-                UIManager.Instance?.SetObjective("Inspect the room and access the control panel.");
+                eyelids?.SetOpenness(1f);
+                EnableGameplay();
                 return;
             }
 
@@ -74,102 +54,94 @@ namespace MadMantra.Cinematics
 
         private IEnumerator WakeUpRoutine()
         {
-            player.CanMove = false;
-            player.CanLook = false;
+            player.CanMove = player.CanLook = false;
 
             Transform mount = player.CameraMount;
-            Transform hand = player.Hand != null ? player.Hand.transform : null;
-            Vector3 standingPos = mount.localPosition;
-            Quaternion standingRot = mount.localRotation;
-            Vector3 lyingPos = standingPos + lyingCameraOffset;
-            Quaternion headDownRot = Quaternion.Euler(headDownPitch, 0f, 0f);
-            Quaternion headUpRot = Quaternion.Euler(headUpPitch, 0f, 0f);
+            Vector3 standPos = mount.localPosition;
+            Quaternion standRot = mount.localRotation;
+            Vector3 liePos = standPos + lyingCameraOffset;
+            Quaternion headDown = Quaternion.Euler(headDownPitch, 0f, 0f);
+            Quaternion headUp = Quaternion.Euler(headUpPitch, 0f, 0f);
 
-            // Plant the hand on the floor using the head-up pose, then keep it there in world space
-            mount.localPosition = lyingPos;
-            mount.localRotation = headUpRot;
-            Vector3 handFloorPos = Vector3.zero;
-            Quaternion handFloorRot = Quaternion.identity;
-            if (hand != null)
-            {
-                player.Hand.SetPoseOffset(lyingHandOffset);
-                handFloorPos = hand.position;
-                handFloorRot = hand.rotation;
-            }
+            // Start face-down on floor, door open, lights flickering
+            mount.SetLocalPositionAndRotation(liePos, headDown);
+            player.Hand?.SetPoseOffset(lyingHandOffset);
+            foreach (var fl in flickerLights) fl?.Flicker(flickerDuration);
 
-            mount.localRotation = headDownRot;
-            if (hand != null) hand.SetPositionAndRotation(handFloorPos, handFloorRot);
+            Quaternion doorClosed = doorHinge != null ? doorHinge.localRotation : Quaternion.identity;
+            if (doorHinge != null) doorHinge.localRotation = doorClosed * Quaternion.Euler(0f, doorOpenAngle, 0f);
 
-            Quaternion doorClosedRot = Quaternion.identity;
-            if (doorHinge != null)
-            {
-                doorClosedRot = doorHinge.localRotation;
-                doorHinge.localRotation = doorClosedRot * Quaternion.Euler(0f, doorOpenAngle, 0f);
-            }
-
-            foreach (var fl in flickerLights)
-            {
-                if (fl != null) fl.Flicker(flickerDuration);
-            }
-
-            // 1. Eyes flutter open
-            foreach (Vector2 key in BlinkKeys)
-            {
-                float from = eyelids.Openness;
-                for (float e = 0f; e < key.y; e += Time.deltaTime)
-                {
-                    eyelids.SetOpenness(Mathf.Lerp(from, key.x, Mathf.SmoothStep(0f, 1f, e / key.y)));
-                    yield return null;
-                }
-                eyelids.SetOpenness(key.x);
-            }
-
-            // 2. Lift head off the floor
-            for (float e = 0f; e < headLiftDuration; e += Time.deltaTime)
-            {
-                mount.localRotation = Quaternion.Slerp(headDownRot, headUpRot, Mathf.SmoothStep(0f, 1f, e / headLiftDuration));
-                if (hand != null) hand.SetPositionAndRotation(handFloorPos, handFloorRot);
-                yield return null;
-            }
-            mount.localRotation = headUpRot;
-            if (hand != null) player.Hand.SetPoseOffset(lyingHandOffset);
-
-            // 3. Door slams shut in front of the player
-            if (doorHinge != null)
-            {
-                Quaternion doorOpenRot = doorHinge.localRotation;
-                for (float e = 0f; e < doorCloseDuration; e += Time.deltaTime)
-                {
-                    float t = e / doorCloseDuration;
-                    doorHinge.localRotation = Quaternion.Slerp(doorOpenRot, doorClosedRot, t * t);
-                    yield return null;
-                }
-                doorHinge.localRotation = doorClosedRot;
-            }
-
+            // 4 clear beats:
+            yield return BlinkAwake();
+            yield return LiftHead(mount, headDown, headUp);
+            yield return SlamDoor(doorClosed);
             yield return new WaitForSeconds(reactionPause);
-
-            // 4. Get up to standing
-            for (float e = 0f; e < getUpDuration; e += Time.deltaTime)
-            {
-                float t = Mathf.SmoothStep(0f, 1f, e / getUpDuration);
-                float swayX = Mathf.Sin(e * 2f) * 0.02f * (1f - t);
-                float swayY = Mathf.Cos(e * 1.5f) * 0.015f * (1f - t);
-
-                mount.localPosition = Vector3.Lerp(lyingPos, standingPos, t) + new Vector3(swayX, swayY, 0f);
-                mount.localRotation = Quaternion.Slerp(headUpRot, standingRot, t);
-                if (hand != null) player.Hand.SetPoseOffset(Vector3.Lerp(lyingHandOffset, Vector3.zero, t));
-                yield return null;
-            }
-
-            mount.localPosition = standingPos;
-            mount.localRotation = standingRot;
-            if (hand != null) player.Hand.SetPoseOffset(Vector3.zero);
+            yield return StandUp(mount, liePos, standPos, headUp, standRot);
 
             yield return new WaitForSeconds(settleDuration);
+            EnableGameplay();
+        }
 
-            player.CanMove = true;
-            player.CanLook = true;
+        private IEnumerator BlinkAwake()
+        {
+            if (eyelids == null) yield break;
+            eyelids.SetOpenness(0f);
+            yield return new WaitForSeconds(1.0f);
+            yield return BlinkTo(0.4f, 0.7f);
+            yield return BlinkTo(0.0f, 0.3f);
+            yield return new WaitForSeconds(0.4f);
+            yield return BlinkTo(1.0f, 0.8f);
+        }
+
+        private IEnumerator BlinkTo(float target, float duration)
+        {
+            float from = eyelids.Openness;
+            for (float t = 0f; t < 1f; t += Time.deltaTime / duration)
+            {
+                eyelids.SetOpenness(Mathf.Lerp(from, target, Mathf.SmoothStep(0f, 1f, t)));
+                yield return null;
+            }
+            eyelids.SetOpenness(target);
+        }
+
+        private IEnumerator LiftHead(Transform mount, Quaternion from, Quaternion to)
+        {
+            for (float t = 0f; t < 1f; t += Time.deltaTime / headLiftDuration)
+            {
+                mount.localRotation = Quaternion.Slerp(from, to, Mathf.SmoothStep(0f, 1f, t));
+                yield return null;
+            }
+            mount.localRotation = to;
+        }
+
+        private IEnumerator SlamDoor(Quaternion closedRot)
+        {
+            if (doorHinge == null) yield break;
+            Quaternion openRot = doorHinge.localRotation;
+            for (float t = 0f; t < 1f; t += Time.deltaTime / doorCloseDuration)
+            {
+                doorHinge.localRotation = Quaternion.Slerp(openRot, closedRot, t * t);
+                yield return null;
+            }
+            doorHinge.localRotation = closedRot;
+        }
+
+        private IEnumerator StandUp(Transform mount, Vector3 fromPos, Vector3 toPos, Quaternion fromRot, Quaternion toRot)
+        {
+            for (float t = 0f; t < 1f; t += Time.deltaTime / getUpDuration)
+            {
+                float s = Mathf.SmoothStep(0f, 1f, t);
+                mount.SetLocalPositionAndRotation(Vector3.Lerp(fromPos, toPos, s), Quaternion.Slerp(fromRot, toRot, s));
+                player.Hand?.SetPoseOffset(Vector3.Lerp(lyingHandOffset, Vector3.zero, s));
+                yield return null;
+            }
+            mount.SetLocalPositionAndRotation(toPos, toRot);
+            player.Hand?.SetPoseOffset(Vector3.zero);
+        }
+
+        private void EnableGameplay()
+        {
+            player.CanMove = player.CanLook = true;
             UIManager.Instance?.SetCrosshair(true);
             UIManager.Instance?.SetObjective("Inspect the room and access the control panel.");
         }
