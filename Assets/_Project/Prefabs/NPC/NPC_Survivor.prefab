@@ -696,7 +696,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7969449497059652239
 Transform:
   m_ObjectHideFlags: 0
@@ -1091,6 +1091,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8300000000000000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8300000000000000002}
+  m_Layer: 0
+  m_Name: DialogueFocusPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8300000000000000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8300000000000000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.52, z: -1.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2999793466019242036}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8873894865643738189
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,13 +1131,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2999793466019242036}
-  - component: {fileID: 5562390132702320717}
-  - component: {fileID: 8907434264395498434}
-  - component: {fileID: 6070032551330341579}
-  - component: {fileID: 8832359953982846422}
   - component: {fileID: 3259030564732687454}
   - component: {fileID: 9201541073191996479}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: NPC_Survivor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1127,90 +1154,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7969449497059652239}
+  - {fileID: 8300000000000000002}
+  - {fileID: 785614566268828449}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5562390132702320717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8873894865643738189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a1155bdbdf05aa4d9bfd2acc9861872, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.NPC.NPCHeadTracker
-  headBone: {fileID: 3091620255446682114}
-  chestBone: {fileID: 4563526932625110795}
-  trackingDistance: 7
-  trackingSpeed: 5
-  maxHorizontalAngle: 70
-  maxVerticalAngle: 35
-  target: {fileID: 0}
---- !u!114 &8907434264395498434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8873894865643738189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306b476b20b2da348b7c57ea0b6594f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.NPC.NPCDisappointmentAnimation
-  headBone: {fileID: 3091620255446682114}
-  spineBone: {fileID: 4563526932625110795}
-  leftShoulder: {fileID: 0}
-  rightShoulder: {fileID: 0}
-  slumpDuration: 0.8
-  headShakeDuration: 1.2
-  pauseDuration: 0.8
---- !u!114 &6070032551330341579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8873894865643738189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbc75fcbca7ee9d43aca488628f0e02b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.NPC.NPCExitController
-  waypoints:
-  - {fileID: 0}
-  exitDoor: {fileID: 0}
-  walkSpeed: 2.2
-  turnSpeed: 6
-  stepCycleSpeed: 8
-  leftLeg: {fileID: 3506848112809165465}
-  rightLeg: {fileID: 5428999939722887509}
-  leftArm: {fileID: 70893526294231805}
-  rightArm: {fileID: 6132128246674867764}
-  bodyRoot: {fileID: 7969449497059652239}
---- !u!114 &8832359953982846422
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8873894865643738189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ca904482c157b64a9955f51cf2feb9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Dialogue.DialogueController
-  interactionPrompt: Press [E] to interact
-  canInteract: 1
-  highlightRenderer: {fileID: 4959808611754320137}
-  highlightColor: {r: 1.2, g: 1.2, b: 1.2, a: 1}
-  dialogueLines: []
-  cinematicFocusTarget: {fileID: 235434825323985289}
-  cinematicCameraMount: {fileID: 0}
-  npcController: {fileID: 9201541073191996479}
-  dialogueCam: {fileID: 0}
 --- !u!136 &3259030564732687454
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1246,12 +1193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a05654f4770ead24a8a87a358ff8bf33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MadMantra.NPC.NPCController
-  headTracker: {fileID: 5562390132702320717}
-  disappointmentAnim: {fileID: 8907434264395498434}
-  exitController: {fileID: 6070032551330341579}
-  dialogueController: {fileID: 8832359953982846422}
-  headTransform: {fileID: 3091620255446682114}
-  jawTransform: {fileID: 4389749852639822535}
+  animator: {fileID: 6631335624113561947}
 --- !u!1 &8948274902292542628
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,3 +1306,78 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &967615537342192842
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2999793466019242036}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_Name
+      value: Model_MixamoNPC
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: b74377b2c75f37d4787feeef56a69819, type: 2}
+    - target: {fileID: 5866666021909216657, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+--- !u!4 &785614566268828449 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+  m_PrefabInstance: {fileID: 967615537342192842}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &6631335624113561947 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+  m_PrefabInstance: {fileID: 967615537342192842}
+  m_PrefabAsset: {fileID: 0}

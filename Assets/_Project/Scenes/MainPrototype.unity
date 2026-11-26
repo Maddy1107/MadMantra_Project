@@ -1135,12 +1135,14 @@ MonoBehaviour:
   getUpDuration: 4.5
   settleDuration: 0.8
   flickerDuration: 6
-  doorHinge: {fileID: 1785185835}
-  doorOpenAngle: -90
-  doorCloseDuration: 0.6
-  skipWakeUp: 1
+  securityDoor: {fileID: 4424265489905329978}
+  introNpc: {fileID: 765566711657360059}
+  npcIntroStartPos: {x: 0, y: 0, z: 3.6}
+  npcThroughDoorPos: {x: 0, y: 0, z: 6.2}
+  npcWalkSpeed: 2
+  skipWakeUp: 0
   player: {fileID: 41347021}
-  eyelids: {fileID: 0}
+  eyelids: {fileID: 3488377918603388488}
   flickerLights:
   - {fileID: 1406620381}
   - {fileID: 1636617544}
@@ -7098,7 +7100,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.00000004371139
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.x
@@ -7106,7 +7108,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.z
@@ -7144,11 +7146,27 @@ PrefabInstance:
       propertyPath: m_Name
       value: NPC_Survivor
       objectReference: {fileID: 0}
+    - target: {fileID: 9201541073191996479, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
+      propertyPath: lookTarget
+      value: 
+      objectReference: {fileID: 4566718136457708579}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5997313283584014389, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
+--- !u!114 &765566711657360059 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9201541073191996479, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
+  m_PrefabInstance: {fileID: 765566711657360049}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a05654f4770ead24a8a87a358ff8bf33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.NPC.NPCController
 --- !u!1001 &1411188827957165851
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7449,6 +7467,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73ac5e8b08d1d87488d1425fafdae899, type: 3}
+--- !u!114 &3488377918603388488 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 710727850082675108, guid: 73ac5e8b08d1d87488d1425fafdae899, type: 3}
+  m_PrefabInstance: {fileID: 3488377918603388477}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b08a72ff7612945bc49acc73f0fd78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Cinematics.EyelidOverlay
 --- !u!1001 &4424265489905329971
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7518,6 +7547,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5505832479652551146, guid: 3b9455a70f6477b4783f7310ee5a9305, type: 3}
   m_PrefabInstance: {fileID: 4424265489905329971}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4424265489905329978 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2052505230832869431, guid: 3b9455a70f6477b4783f7310ee5a9305, type: 3}
+  m_PrefabInstance: {fileID: 4424265489905329971}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f47c7daecad43c4ca9e88c2d03f528f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
 --- !u!1001 &4566718136457708574
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7615,6 +7655,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b83debca7289dde44bb94cd28ce0bb27, type: 3}
+--- !u!4 &4566718136457708579 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7271383096692990443, guid: b83debca7289dde44bb94cd28ce0bb27, type: 3}
+  m_PrefabInstance: {fileID: 4566718136457708574}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

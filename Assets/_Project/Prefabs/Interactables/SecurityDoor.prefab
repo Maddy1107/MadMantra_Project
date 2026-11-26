@@ -385,7 +385,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
   openAngle: -90
   openDuration: 0.9
-  lockMode: 1
+  lockMode: 0
   canClose: 0
   lockedMessage: Locked - Security Keycard Required
   onOpened:

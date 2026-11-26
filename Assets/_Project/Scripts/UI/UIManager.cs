@@ -8,6 +8,7 @@ namespace MadMantra.UI
     {
         public static UIManager Instance { get; private set; }
 
+        [Header("HUD")]
         [SerializeField] private GameObject crosshair;
         [SerializeField] private GameObject promptPanel;
         [SerializeField] private Text promptText;
@@ -18,12 +19,24 @@ namespace MadMantra.UI
         [SerializeField] private GameObject feedbackPanel;
         [SerializeField] private Text feedbackText;
 
+        [Header("Subtitles")]
+        [SerializeField] private GameObject subtitlePanel;
+        [SerializeField] private Text speakerText;
+        [SerializeField] private Text subtitleText;
+        [SerializeField] private GameObject continuePrompt;
+        [SerializeField] private float charsPerSecond = 40f;
+
         private Coroutine feedbackRoutine;
+        private Coroutine typeRoutine;
+        private string fullSubtitle = "";
+
+        public bool IsTyping { get; private set; }
 
         private void Awake()
         {
             Instance = this;
             HidePrompt();
+            HideSubtitle();
             SetCrosshair(false);
             SetPuzzleHint(false);
             SetKeyBadge(false);
@@ -54,6 +67,50 @@ namespace MadMantra.UI
         {
             if (feedbackRoutine != null) StopCoroutine(feedbackRoutine);
             feedbackRoutine = StartCoroutine(FeedbackRoutine(message, duration));
+        }
+
+        public void ShowSubtitle(string speaker, string body)
+        {
+            fullSubtitle = body ?? "";
+            subtitlePanel?.SetActive(true);
+            if (speakerText != null) speakerText.text = speaker ?? "";
+            continuePrompt?.SetActive(false);
+
+            if (typeRoutine != null) StopCoroutine(typeRoutine);
+            typeRoutine = StartCoroutine(TypewriterRoutine());
+        }
+
+        public void SkipTypewriter()
+        {
+            if (!IsTyping) return;
+            if (typeRoutine != null) StopCoroutine(typeRoutine);
+            if (subtitleText != null) subtitleText.text = fullSubtitle;
+            IsTyping = false;
+            continuePrompt?.SetActive(true);
+        }
+
+        public void HideSubtitle()
+        {
+            if (typeRoutine != null) StopCoroutine(typeRoutine);
+            IsTyping = false;
+            subtitlePanel?.SetActive(false);
+            continuePrompt?.SetActive(false);
+        }
+
+        private IEnumerator TypewriterRoutine()
+        {
+            IsTyping = true;
+            if (subtitleText != null) subtitleText.text = "";
+            float delay = 1f / Mathf.Max(1f, charsPerSecond);
+
+            for (int i = 1; i <= fullSubtitle.Length; i++)
+            {
+                if (subtitleText != null) subtitleText.text = fullSubtitle.Substring(0, i);
+                yield return new WaitForSeconds(delay);
+            }
+
+            IsTyping = false;
+            continuePrompt?.SetActive(true);
         }
 
         private IEnumerator FeedbackRoutine(string message, float duration)

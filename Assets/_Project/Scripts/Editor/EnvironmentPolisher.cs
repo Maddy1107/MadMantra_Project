@@ -1,20 +1,147 @@
 #if UNITY_EDITOR
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
+using MadMantra.NPC;
 
 namespace MadMantra.Editor
 {
     public static class EnvironmentPolisher
     {
-        private const string ModelDir = "Assets/_Project/Models/";
+        private const string ModelDir = "Assets/_Project/Models/Environment/";
         private const string MatDir = "Assets/_Project/Materials/";
+
+        [MenuItem("MadMantra/Setup Mixamo NPC")]
+        public static void SetupMixamoNPC()
+        {
+            const string idlePath = "Assets/_Project/Models/NPC/Standing Idle.fbx";
+            const string walkPath = "Assets/_Project/Models/NPC/Walking.fbx";
+            const string texFolder = "Assets/_Project/Models/NPC/Textures";
+            const string animCtrlPath = "Assets/_Project/Animations/NPC_Animator.controller";
+            const string npcPrefabPath = "Assets/_Project/Prefabs/NPC/NPC_Survivor.prefab";
+
+            // 1. Configure Idle FBX as Humanoid + looping + extract embedded textures
+            ModelImporter idleImp = AssetImporter.GetAtPath(idlePath) as ModelImporter;
+            ModelImporter walkImp = AssetImporter.GetAtPath(walkPath) as ModelImporter;
+            if (idleImp == null || walkImp == null)
+            {
+                Debug.LogError("[EnvironmentPolisher] Standing Idle.fbx or Walking.fbx not found in Assets/_Project/Models/NPC/");
+                return;
+            }
+
+            if (!AssetDatabase.IsValidFolder(texFolder))
+                AssetDatabase.CreateFolder("Assets/_Project/Models/NPC", "Textures");
+            if (!AssetDatabase.IsValidFolder("Assets/_Project/Animations"))
+                AssetDatabase.CreateFolder("Assets/_Project", "Animations");
+
+            idleImp.animationType = ModelImporterAnimationType.Human;
+            idleImp.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
+            idleImp.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;
+            SetClipLoop(idleImp, true);
+            idleImp.ExtractTextures(texFolder);
+            idleImp.SaveAndReimport();
+            AssetDatabase.Refresh();
+
+            Avatar npcAvatar = AssetDatabase.LoadAllAssetsAtPath(idlePath).OfType<Avatar>().FirstOrDefault();
+
+            // 2. Configure Walking FBX as Humanoid sharing Idle's Avatar + looping
+            walkImp.animationType = ModelImporterAnimationType.Human;
+            if (npcAvatar != null)
+            {
+                walkImp.avatarSetup = ModelImporterAvatarSetup.CopyFromOther;
+                walkImp.sourceAvatar = npcAvatar;
+            }
+            SetClipLoop(walkImp, true);
+            walkImp.SaveAndReimport();
+
+            AnimationClip idleClip = AssetDatabase.LoadAllAssetsAtPath(idlePath)
+                .OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
+            AnimationClip walkClip = AssetDatabase.LoadAllAssetsAtPath(walkPath)
+                .OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
+
+            // 3. Build clean NPC_Animator.controller (Idle <-> Walk via IsWalking bool)
+            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(animCtrlPath) != null)
+                AssetDatabase.DeleteAsset(animCtrlPath);
+
+            AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(animCtrlPath);
+            ctrl.AddParameter("IsWalking", AnimatorControllerParameterType.Bool);
+            AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
+
+            AnimatorState idleState = sm.AddState("Idle");
+            idleState.motion = idleClip;
+            sm.defaultState = idleState;
+
+            AnimatorState walkState = sm.AddState("Walk");
+            walkState.motion = walkClip;
+
+            AnimatorStateTransition toWalk = idleState.AddTransition(walkState);
+            toWalk.hasExitTime = false;
+            toWalk.duration = 0.15f;
+            toWalk.AddCondition(AnimatorConditionMode.If, 0f, "IsWalking");
+
+            AnimatorStateTransition toIdle = walkState.AddTransition(idleState);
+            toIdle.hasExitTime = false;
+            toIdle.duration = 0.15f;
+            toIdle.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsWalking");
+            EditorUtility.SetDirty(ctrl);
+
+            // 4. Swap placeholder body in NPC_Survivor.prefab with Mixamo character
+            GameObject npcFbx = AssetDatabase.LoadAssetAtPath<GameObject>(idlePath);
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(npcPrefabPath);
+            try
+            {
+                Transform oldModelRoot = prefabRoot.transform.Find("ModelRoot");
+                if (oldModelRoot != null) oldModelRoot.gameObject.SetActive(false);
+
+                Transform existing = prefabRoot.transform.Find("Model_MixamoNPC");
+                if (existing != null) Object.DestroyImmediate(existing.gameObject);
+
+                GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(npcFbx);
+                inst.name = "Model_MixamoNPC";
+                inst.transform.SetParent(prefabRoot.transform, false);
+                inst.transform.localPosition = Vector3.zero;
+                inst.transform.localRotation = Quaternion.Euler(0f, 180f, 0f); // Matches South-facing orientation
+                inst.transform.localScale = Vector3.one;
+
+                Animator anim = inst.GetComponent<Animator>();
+                if (anim == null) anim = inst.AddComponent<Animator>();
+                anim.runtimeAnimatorController = ctrl;
+                anim.avatar = npcAvatar;
+                anim.applyRootMotion = false;
+
+                NPCController npcCtrl = prefabRoot.GetComponent<NPCController>();
+                if (npcCtrl != null)
+                {
+                    SerializedObject so = new SerializedObject(npcCtrl);
+                    so.FindProperty("animator").objectReferenceValue = anim;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, npcPrefabPath);
+                Debug.Log("[EnvironmentPolisher] Mixamo NPC configured with Idle & Walk animations in NPC_Survivor.prefab!");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
+        }
+
+        private static void SetClipLoop(ModelImporter imp, bool loop)
+        {
+            ModelImporterClipAnimation[] clips = imp.clipAnimations;
+            if (clips == null || clips.Length == 0) clips = imp.defaultClipAnimations;
+            for (int i = 0; i < clips.Length; i++) clips[i].loopTime = loop;
+            imp.clipAnimations = clips;
+        }
 
         [MenuItem("MadMantra/Apply 3D Hand to Player")]
         public static void ApplyHandToPlayer()
         {
-            const string handFbxPath = "Assets/_Project/Models/first-person-arm-hand-fingerless-gloves/source/hand final.fbx";
-            const string handTexPath = "Assets/_Project/Models/first-person-arm-hand-fingerless-gloves/textures/texture_basecolor.png";
+            const string handFbxPath = "Assets/_Project/Models/Hand/hand final.fbx";
+            const string handTexPath = "Assets/_Project/Models/Hand/texture_basecolor.png";
             const string playerPrefabPath = "Assets/_Project/Prefabs/Player/Player.prefab";
 
             GameObject handFbx = AssetDatabase.LoadAssetAtPath<GameObject>(handFbxPath);
