@@ -1832,6 +1832,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 531251968}
+  - component: {fileID: 8500000000000000001}
   m_Layer: 0
   m_Name: Hinge
   m_TagString: Untagged
@@ -1856,6 +1857,26 @@ Transform:
   - {fileID: 1010875837}
   m_Father: {fileID: 1619662660}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8500000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531251967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f47c7daecad43c4ca9e88c2d03f528f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
+  openAngle: -90
+  openDuration: 0.9
+  lockMode: 0
+  canClose: 1
+  lockedMessage: Locked
+  onOpened:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &561275860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2406,7 +2427,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -5334,7 +5355,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -5533,7 +5554,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -5752,7 +5773,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1619662660}
-  - component: {fileID: 1619662661}
   m_Layer: 0
   m_Name: ExitDoor_Room2
   m_TagString: Untagged
@@ -5779,18 +5799,6 @@ Transform:
   - {fileID: 531251968}
   m_Father: {fileID: 1126437792}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1619662661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1619662659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47c059b05c582d148b35beccfd1aafb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.DoorController
 --- !u!1 &1636617541
 GameObject:
   m_ObjectHideFlags: 0
@@ -5854,7 +5862,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -6090,7 +6098,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -7100,7 +7108,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.x
@@ -7108,7 +7116,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalRotation.z
@@ -7120,36 +7128,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 2999793466019242036, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6070032551330341579, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
-      propertyPath: exitDoor
-      value: 
-      objectReference: {fileID: 1619662661}
-    - target: {fileID: 6070032551330341579, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
-      propertyPath: 'waypoints.Array.data[0]'
-      value: 
-      objectReference: {fileID: 1275394218}
-    - target: {fileID: 8832359953982846422, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
-      propertyPath: dialogueCam
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 8832359953982846422, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
-      propertyPath: cinematicCameraMount
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8873894865643738189, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
       propertyPath: m_Name
       value: NPC_Survivor
       objectReference: {fileID: 0}
     - target: {fileID: 9201541073191996479, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}
-      propertyPath: lookTarget
+      propertyPath: exitDoor
       value: 
-      objectReference: {fileID: 4566718136457708579}
+      objectReference: {fileID: 8500000000000000001}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 5997313283584014389, guid: 6edf688b87e0cc3439a22cdc96043aac, type: 3}

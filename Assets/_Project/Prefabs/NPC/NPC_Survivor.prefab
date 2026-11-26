@@ -1155,7 +1155,7 @@ Transform:
   m_Children:
   - {fileID: 7969449497059652239}
   - {fileID: 8300000000000000002}
-  - {fileID: 785614566268828449}
+  - {fileID: 7152184283276295999}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &3259030564732687454
@@ -1193,8 +1193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a05654f4770ead24a8a87a358ff8bf33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MadMantra.NPC.NPCController
-  animator: {fileID: 6631335624113561947}
+  animator: {fileID: 3864516614194816325}
   dialogueFocusPoint: {fileID: 8300000000000000002}
+  dialogue: {fileID: 11400000, guid: d1c086403c234932aa61e329ba018ed2, type: 2}
+  exitDoor: {fileID: 0}
+  exitInsidePos: {x: 0, y: 0, z: 10}
+  exitOutsidePos: {x: 0, y: 0, z: 12.6}
+  disappointedDuration: 2.6
 --- !u!1 &8948274902292542628
 GameObject:
   m_ObjectHideFlags: 0
@@ -1307,7 +1312,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1001 &967615537342192842
+--- !u!1001 &7262917289378175188
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1372,13 +1377,13 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
---- !u!4 &785614566268828449 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
-  m_PrefabInstance: {fileID: 967615537342192842}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &6631335624113561947 stripped
+--- !u!95 &3864516614194816325 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
-  m_PrefabInstance: {fileID: 967615537342192842}
+  m_PrefabInstance: {fileID: 7262917289378175188}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7152184283276295999 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fe45561d1d03ae647ad5451a86058571, type: 3}
+  m_PrefabInstance: {fileID: 7262917289378175188}
   m_PrefabAsset: {fileID: 0}

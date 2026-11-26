@@ -612,6 +612,7 @@ GameObject:
   - component: {fileID: 5458819372733412280}
   - component: {fileID: 4470121535635306251}
   - component: {fileID: 2099091888082411164}
+  - component: {fileID: 8400000000000000001}
   m_Layer: 0
   m_Name: Canvas_UI
   m_TagString: Untagged
@@ -1662,3 +1663,15 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8400000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3247122663145619679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bdbc8a8180c41aeb25dd98c63280f10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Dialogue.DialogueRunner

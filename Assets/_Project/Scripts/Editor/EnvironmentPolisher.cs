@@ -19,16 +19,17 @@ namespace MadMantra.Editor
         {
             const string idlePath = "Assets/_Project/Models/NPC/Standing Idle.fbx";
             const string walkPath = "Assets/_Project/Models/NPC/Walking.fbx";
+            const string talkPath = "Assets/_Project/Models/NPC/Talking.fbx";
+            const string disappointedPath = "Assets/_Project/Models/NPC/Disappointed.fbx";
             const string texFolder = "Assets/_Project/Models/NPC/Textures";
             const string animCtrlPath = "Assets/_Project/Animations/NPC_Animator.controller";
             const string npcPrefabPath = "Assets/_Project/Prefabs/NPC/NPC_Survivor.prefab";
 
             // 1. Configure Idle FBX as Humanoid + looping + extract embedded textures
             ModelImporter idleImp = AssetImporter.GetAtPath(idlePath) as ModelImporter;
-            ModelImporter walkImp = AssetImporter.GetAtPath(walkPath) as ModelImporter;
-            if (idleImp == null || walkImp == null)
+            if (idleImp == null)
             {
-                Debug.LogError("[EnvironmentPolisher] Standing Idle.fbx or Walking.fbx not found in Assets/_Project/Models/NPC/");
+                Debug.LogError("[EnvironmentPolisher] Standing Idle.fbx not found in Assets/_Project/Models/NPC/");
                 return;
             }
 
@@ -47,27 +48,20 @@ namespace MadMantra.Editor
 
             Avatar npcAvatar = AssetDatabase.LoadAllAssetsAtPath(idlePath).OfType<Avatar>().FirstOrDefault();
 
-            // 2. Configure Walking FBX as Humanoid sharing Idle's Avatar + looping
-            walkImp.animationType = ModelImporterAnimationType.Human;
-            if (npcAvatar != null)
-            {
-                walkImp.avatarSetup = ModelImporterAvatarSetup.CopyFromOther;
-                walkImp.sourceAvatar = npcAvatar;
-            }
-            SetClipLoop(walkImp, true);
-            walkImp.SaveAndReimport();
+            // 2. Configure Walking, Talking, and Disappointed FBXs sharing Idle's Avatar
+            AnimationClip idleClip = LoadFirstClip(idlePath);
+            AnimationClip walkClip = ConfigureClipFbx(walkPath, npcAvatar, true);
+            AnimationClip talkClip = ConfigureClipFbx(talkPath, npcAvatar, false);
+            AnimationClip disappointedClip = ConfigureClipFbx(disappointedPath, npcAvatar, false);
 
-            AnimationClip idleClip = AssetDatabase.LoadAllAssetsAtPath(idlePath)
-                .OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
-            AnimationClip walkClip = AssetDatabase.LoadAllAssetsAtPath(walkPath)
-                .OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
-
-            // 3. Build clean NPC_Animator.controller (Idle <-> Walk via IsWalking bool)
+            // 3. Build clean NPC_Animator.controller (Idle, Walk, Talking, Disappointed)
             if (AssetDatabase.LoadAssetAtPath<AnimatorController>(animCtrlPath) != null)
                 AssetDatabase.DeleteAsset(animCtrlPath);
 
             AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(animCtrlPath);
             ctrl.AddParameter("IsWalking", AnimatorControllerParameterType.Bool);
+            ctrl.AddParameter("Talk", AnimatorControllerParameterType.Trigger);
+            ctrl.AddParameter("Disappointed", AnimatorControllerParameterType.Trigger);
             AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
 
             AnimatorState idleState = sm.AddState("Idle");
@@ -77,15 +71,33 @@ namespace MadMantra.Editor
             AnimatorState walkState = sm.AddState("Walk");
             walkState.motion = walkClip;
 
-            AnimatorStateTransition toWalk = idleState.AddTransition(walkState);
-            toWalk.hasExitTime = false;
-            toWalk.duration = 0.15f;
-            toWalk.AddCondition(AnimatorConditionMode.If, 0f, "IsWalking");
+            AnimatorState talkState = sm.AddState("Talking");
+            talkState.motion = talkClip;
 
-            AnimatorStateTransition toIdle = walkState.AddTransition(idleState);
-            toIdle.hasExitTime = false;
-            toIdle.duration = 0.15f;
-            toIdle.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsWalking");
+            AnimatorState disappointedState = sm.AddState("Disappointed");
+            disappointedState.motion = disappointedClip;
+
+            AddBoolTransition(idleState, walkState, "IsWalking", true);
+            AddBoolTransition(walkState, idleState, "IsWalking", false);
+
+            AddTriggerTransition(idleState, talkState, "Talk");
+            AddTriggerTransition(talkState, talkState, "Talk");
+
+            AnimatorStateTransition talkToIdle = talkState.AddTransition(idleState);
+            talkToIdle.hasExitTime = true;
+            talkToIdle.exitTime = 0.9f;
+            talkToIdle.duration = 0.15f;
+
+            AddTriggerTransition(idleState, disappointedState, "Disappointed");
+            AddTriggerTransition(talkState, disappointedState, "Disappointed");
+
+            AnimatorStateTransition disappointedToIdle = disappointedState.AddTransition(idleState);
+            disappointedToIdle.hasExitTime = true;
+            disappointedToIdle.exitTime = 0.9f;
+            disappointedToIdle.duration = 0.15f;
+
+            AddBoolTransition(disappointedState, walkState, "IsWalking", true);
+
             EditorUtility.SetDirty(ctrl);
 
             // 4. Swap placeholder body in NPC_Survivor.prefab with Mixamo character
@@ -103,7 +115,7 @@ namespace MadMantra.Editor
                 inst.name = "Model_MixamoNPC";
                 inst.transform.SetParent(prefabRoot.transform, false);
                 inst.transform.localPosition = Vector3.zero;
-                inst.transform.localRotation = Quaternion.Euler(0f, 180f, 0f); // Matches South-facing orientation
+                inst.transform.localRotation = Quaternion.identity;
                 inst.transform.localScale = Vector3.one;
 
                 Animator anim = inst.GetComponent<Animator>();
@@ -121,12 +133,53 @@ namespace MadMantra.Editor
                 }
 
                 PrefabUtility.SaveAsPrefabAsset(prefabRoot, npcPrefabPath);
-                Debug.Log("[EnvironmentPolisher] Mixamo NPC configured with Idle & Walk animations in NPC_Survivor.prefab!");
+                Debug.Log("[EnvironmentPolisher] Mixamo NPC configured with Idle, Walk, Talking & Disappointed animations!");
             }
             finally
             {
                 PrefabUtility.UnloadPrefabContents(prefabRoot);
             }
+        }
+
+        private static AnimationClip ConfigureClipFbx(string fbxPath, Avatar avatar, bool loop)
+        {
+            ModelImporter imp = AssetImporter.GetAtPath(fbxPath) as ModelImporter;
+            if (imp == null)
+            {
+                Debug.LogWarning("[EnvironmentPolisher] Animation FBX not found: " + fbxPath);
+                return null;
+            }
+            imp.animationType = ModelImporterAnimationType.Human;
+            if (avatar != null)
+            {
+                imp.avatarSetup = ModelImporterAvatarSetup.CopyFromOther;
+                imp.sourceAvatar = avatar;
+            }
+            SetClipLoop(imp, loop);
+            imp.SaveAndReimport();
+            return LoadFirstClip(fbxPath);
+        }
+
+        private static AnimationClip LoadFirstClip(string fbxPath)
+        {
+            return AssetDatabase.LoadAllAssetsAtPath(fbxPath)
+                .OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
+        }
+
+        private static void AddBoolTransition(AnimatorState from, AnimatorState to, string param, bool value)
+        {
+            AnimatorStateTransition t = from.AddTransition(to);
+            t.hasExitTime = false;
+            t.duration = 0.15f;
+            t.AddCondition(value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, param);
+        }
+
+        private static void AddTriggerTransition(AnimatorState from, AnimatorState to, string trigger)
+        {
+            AnimatorStateTransition t = from.AddTransition(to);
+            t.hasExitTime = false;
+            t.duration = 0.15f;
+            t.AddCondition(AnimatorConditionMode.If, 0f, trigger);
         }
 
         private static void SetClipLoop(ModelImporter imp, bool loop)

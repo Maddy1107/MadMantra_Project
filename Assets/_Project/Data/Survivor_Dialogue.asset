@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbf1ec64108f45e6ad63734d91843d30, type: 3}
+  m_Name: Survivor_Dialogue
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Dialogue.DialogueData
+  lines:
+  - speaker: Survivor
+    text: You're finally awake... The bulkhead sealed before I could get back to you.
+  - speaker: Survivor
+    text: Power failed across Sector 4. Good work getting the auxiliary panel online.
+  - speaker: Survivor
+    text: Wait - you didn't find the override core in Room 1, did you?
+  - speaker: Survivor
+    text: Without it, the main lift won't move. I'll have to check the exit corridor myself...
