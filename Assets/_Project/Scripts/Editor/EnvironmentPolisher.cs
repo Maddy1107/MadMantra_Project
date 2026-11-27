@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
+using MadMantra.Audio;
 using MadMantra.Environment;
 using MadMantra.NPC;
 
@@ -199,6 +200,43 @@ namespace MadMantra.Editor
             imp.clipAnimations = clips;
         }
 
+        [MenuItem("MadMantra/Setup Audio Manager")]
+        public static void SetupAudioManager()
+        {
+            const string audioDir = "Assets/_Project/Audio/";
+            GameObject go = GameObject.Find("AudioManager");
+            if (go != null) Object.DestroyImmediate(go);
+
+            go = new GameObject("AudioManager");
+            AudioSource ambient = go.AddComponent<AudioSource>();
+            ambient.playOnAwake = false;
+            ambient.spatialBlend = 0f;
+
+            AudioSource sfx = go.AddComponent<AudioSource>();
+            sfx.playOnAwake = false;
+            sfx.spatialBlend = 0f;
+
+            AudioManager mgr = go.AddComponent<AudioManager>();
+            SerializedObject so = new SerializedObject(mgr);
+            so.FindProperty("ambientSource").objectReferenceValue = ambient;
+            so.FindProperty("sfxSource").objectReferenceValue = sfx;
+            so.FindProperty("ambientHum").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "spaceEngineLow_000.ogg");
+            so.FindProperty("lightFlicker").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "forceField_000.ogg");
+            so.FindProperty("footstep").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "impactMetal_000.ogg");
+            so.FindProperty("buttonClick").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "switch_002.ogg");
+            so.FindProperty("puzzleSolved").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "confirmation_002.ogg");
+            so.FindProperty("puzzleFail").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "error_004.ogg");
+            so.FindProperty("keyPickup").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "glass_001.ogg");
+            so.FindProperty("doorLocked").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "impactMetal_002.ogg");
+            so.FindProperty("doorUnlock").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "doorClose_001.ogg");
+            so.FindProperty("doorOpen").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "doorOpen_000.ogg");
+            so.FindProperty("typewriterBlip").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(audioDir + "tick_001.ogg");
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            Debug.Log("[EnvironmentPolisher] AudioManager added to scene with all 11 SFX clips wired! Press Ctrl+S to save.");
+        }
+
         [MenuItem("MadMantra/Setup Door Unlock Key")]
         public static void SetupDoorUnlockKey()
         {
@@ -305,29 +343,40 @@ namespace MadMantra.Editor
         [MenuItem("MadMantra/Apply 3D Hand to Player")]
         public static void ApplyHandToPlayer()
         {
-            const string handFbxPath = "Assets/_Project/Models/Hand/hand final.fbx";
-            const string handTexPath = "Assets/_Project/Models/Hand/texture_basecolor.png";
+            const string handObjPath = "Assets/_Project/Models/Hand/Cybernetic_Arm.obj";
+            const string handTexPath = "Assets/_Project/Models/Hand/textures/Color_f897eebf-ed7a-498e-9800-52e4c6442e88_0.jpeg";
+            const string handNormalPath = "Assets/_Project/Models/Hand/textures/NormalGL_f897eebf-ed7a-498e-9800-52e4c6442e88_2.png";
             const string playerPrefabPath = "Assets/_Project/Prefabs/Player/Player.prefab";
 
-            GameObject handFbx = AssetDatabase.LoadAssetAtPath<GameObject>(handFbxPath);
-            if (handFbx == null)
+            GameObject handModel = AssetDatabase.LoadAssetAtPath<GameObject>(handObjPath);
+            if (handModel == null)
             {
-                Debug.LogError("[EnvironmentPolisher] Hand FBX not found at: " + handFbxPath);
+                Debug.LogError("[EnvironmentPolisher] Cybernetic_Arm.obj not found at: " + handObjPath);
                 return;
             }
 
-            // Create / update gloved hand material
-            string matPath = MatDir + "M_PlayerHand_Gloved.mat";
+            // Ensure normal map is imported as NormalMap
+            TextureImporter normImp = AssetImporter.GetAtPath(handNormalPath) as TextureImporter;
+            if (normImp != null && normImp.textureType != TextureImporterType.NormalMap)
+            {
+                normImp.textureType = TextureImporterType.NormalMap;
+                normImp.SaveAndReimport();
+            }
+
+            // Create / update Cybernetic Arm PBR material
+            string matPath = MatDir + "M_CyberneticArm.mat";
             Material handMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
             if (handMat == null)
             {
                 handMat = new Material(Shader.Find("Standard"));
-                handMat.SetFloat("_Metallic", 0.05f);
-                handMat.SetFloat("_Glossiness", 0.25f);
                 AssetDatabase.CreateAsset(handMat, matPath);
             }
+            handMat.SetFloat("_Metallic", 0.65f);
+            handMat.SetFloat("_Glossiness", 0.55f);
             Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(handTexPath);
             if (tex != null) handMat.mainTexture = tex;
+            Texture2D norm = AssetDatabase.LoadAssetAtPath<Texture2D>(handNormalPath);
+            if (norm != null) { handMat.EnableKeyword("_NORMALMAP"); handMat.SetTexture("_BumpMap", norm); }
             EditorUtility.SetDirty(handMat);
 
             GameObject prefabRoot = PrefabUtility.LoadPrefabContents(playerPrefabPath);
@@ -340,39 +389,43 @@ namespace MadMantra.Editor
                     return;
                 }
 
-                // Hide the 4 placeholder cubes (Forearm, Palm, Thumb, IndexFinger)
-                foreach (Transform child in holder)
+                // Right-hand FPV placement (wrist/forearm tucked neatly into bottom-right corner)
+                holder.localPosition = new Vector3(0.28f, -0.18f, 0.44f);
+                holder.localRotation = Quaternion.identity;
+
+                // Clean previous hand models and hide placeholder cubes
+                for (int i = holder.childCount - 1; i >= 0; i--)
                 {
-                    if (child.name == "Model_GlovedHand") Object.DestroyImmediate(child.gameObject);
-                    else child.gameObject.SetActive(false);
+                    Transform child = holder.GetChild(i);
+                    if (child.name == "Model_GlovedHand" || child.name == "Model_RightHand" || child.name == "Model_LeftHand" || child.name == "Model_CyberneticArm")
+                        Object.DestroyImmediate(child.gameObject);
+                    else
+                        child.gameObject.SetActive(false);
                 }
 
-                GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(handFbx);
-                inst.name = "Model_GlovedHand";
+                // Arm is vertical along Y (-0.5..+0.5): +75X tilts forward, +155Z turns palm down/inward
+                GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(handModel);
+                inst.name = "Model_CyberneticArm";
                 inst.transform.SetParent(holder, false);
                 inst.transform.localPosition = Vector3.zero;
-                inst.transform.localRotation = Quaternion.identity;
-                inst.transform.localScale = Vector3.one;
+                inst.transform.localRotation = Quaternion.Euler(75f, -10f, 155f);
+                inst.transform.localScale = Vector3.one * 0.62f;
                 ApplyMaterial(inst, handMat);
 
-                // Remove any colliders so hand never blocks raycasts
                 foreach (Collider c in inst.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
 
-                // Auto-fit longest dimension to ~0.58m and angle forward with cuff tucked off-screen
-                Bounds b = GetCombinedBounds(inst);
-                float maxDim = Mathf.Max(b.size.x, Mathf.Max(b.size.y, b.size.z));
-                if (maxDim > 0.001f)
+                // Update PlayerHand offsets for single right-hand Cybernetic Arm
+                MadMantra.Player.PlayerHand ph = holder.GetComponent<MadMantra.Player.PlayerHand>();
+                if (ph != null)
                 {
-                    float s = 0.58f / maxDim;
-                    inst.transform.localScale = Vector3.one * s;
-                    inst.transform.localRotation = Quaternion.Euler(6f, 42f, -8f);
-                    Bounds fitted = GetCombinedBounds(inst);
-                    inst.transform.position += (holder.position - fitted.center);
-                    inst.transform.localPosition += new Vector3(0.06f, -0.04f, -0.14f);
+                    SerializedObject so = new SerializedObject(ph);
+                    so.FindProperty("reachOffset").vector3Value = new Vector3(-0.06f, 0.05f, 0.16f);
+                    so.FindProperty("pressTipOffset").vector3Value = new Vector3(0.04f, -0.04f, -0.24f);
+                    so.ApplyModifiedPropertiesWithoutUndo();
                 }
 
                 PrefabUtility.SaveAsPrefabAsset(prefabRoot, playerPrefabPath);
-                Debug.Log("[EnvironmentPolisher] Applied gloved 3D hand to Player.prefab! Adjust Model_GlovedHand localRotation in Player.prefab if needed.");
+                Debug.Log("[EnvironmentPolisher] Applied Cybernetic Arm PBR model to Player.prefab!");
             }
             finally
             {

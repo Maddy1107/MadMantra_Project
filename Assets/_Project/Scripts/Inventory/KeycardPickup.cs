@@ -1,4 +1,5 @@
 using UnityEngine;
+using MadMantra.Audio;
 using MadMantra.Interaction;
 using MadMantra.Player;
 using MadMantra.UI;
@@ -26,6 +27,7 @@ namespace MadMantra.Inventory
         public void Interact(PlayerInteractor interactor)
         {
             interactor.PlayHandInteract();
+            AudioManager.Instance?.PlayKeyPickup();
             interactor.HasKeycard = true;
 
             UIManager.Instance?.HidePrompt();

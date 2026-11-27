@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using MadMantra.Audio;
 
 namespace MadMantra.Environment
 {
@@ -33,6 +34,7 @@ namespace MadMantra.Environment
                 // Modulate intensity between dim struggling hum and bright surges
                 targetLight.intensity = Random.Range(originalIntensity * 0.2f, originalIntensity * 1.4f);
                 targetLight.enabled = Random.value > 0.15f;
+                if (!targetLight.enabled) AudioManager.Instance?.PlayLightFlicker();
 
                 yield return new WaitForSeconds(step);
             }

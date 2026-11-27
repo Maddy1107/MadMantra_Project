@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using MadMantra.Audio;
 using MadMantra.Interaction;
 using MadMantra.Player;
 using MadMantra.UI;
@@ -53,6 +54,7 @@ namespace MadMantra.Environment
             {
                 if (!interactor.HasKeycard)
                 {
+                    AudioManager.Instance?.PlayDoorLocked();
                     UIManager.Instance?.ShowFeedback(lockedMessage);
                     return;
                 }
@@ -90,6 +92,7 @@ namespace MadMantra.Environment
             unlockKeyVisual.gameObject.SetActive(true);
 
             yield return MoveKey(inPos, startRot, 0.35f);
+            AudioManager.Instance?.PlayDoorUnlock();
             yield return MoveKey(inPos, turnedRot, 0.25f);
             yield return new WaitForSeconds(0.15f);
             yield return MoveKey(outPos, turnedRot, 0.25f);
@@ -124,6 +127,7 @@ namespace MadMantra.Environment
             if (IsOpen) return;
             IsOpen = true;
             lockMode = LockMode.Unlocked;
+            AudioManager.Instance?.PlayDoorOpen();
             SwingTo(closedRot * Quaternion.Euler(0f, openAngle, 0f));
             onOpened?.Invoke();
         }
@@ -132,6 +136,7 @@ namespace MadMantra.Environment
         {
             if (!IsOpen) return;
             IsOpen = false;
+            AudioManager.Instance?.PlayDoorOpen();
             SwingTo(closedRot);
         }
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using MadMantra.Audio;
 using MadMantra.Interaction;
 using MadMantra.Player;
 using MadMantra.UI;
@@ -79,6 +80,7 @@ namespace MadMantra.Puzzle
         private void ApplyButtonPress(int index)
         {
             busy = false;
+            AudioManager.Instance?.PlayButtonClick();
             puzzleButtons[index].Press();
             if (index != remaining.Peek()) { StartCoroutine(FailRoutine()); return; }
 
@@ -89,6 +91,7 @@ namespace MadMantra.Puzzle
         private IEnumerator FailRoutine()
         {
             busy = true;
+            AudioManager.Instance?.PlayPuzzleFail();
             foreach (var b in puzzleButtons) b.SetFailState();
             yield return new WaitForSeconds(0.55f);
             foreach (var b in puzzleButtons) b.Release();
@@ -99,6 +102,7 @@ namespace MadMantra.Puzzle
         private IEnumerator SolveRoutine()
         {
             IsSolved = true;
+            AudioManager.Instance?.PlayPuzzleSolved();
             foreach (var b in puzzleButtons) b.SetSolvedState();
             UIManager.Instance?.SetPuzzleHint(false);
 

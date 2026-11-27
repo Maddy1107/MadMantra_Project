@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using MadMantra.Audio;
 
 namespace MadMantra.UI
 {
@@ -106,6 +107,7 @@ namespace MadMantra.UI
             for (int i = 1; i <= fullSubtitle.Length; i++)
             {
                 if (subtitleText != null) subtitleText.text = fullSubtitle.Substring(0, i);
+                if (i % 3 == 0 && fullSubtitle[i - 1] != ' ') AudioManager.Instance?.PlayTypewriterBlip();
                 yield return new WaitForSeconds(delay);
             }
 

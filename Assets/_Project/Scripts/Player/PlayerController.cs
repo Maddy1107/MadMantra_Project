@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using MadMantra.Audio;
 
 namespace MadMantra.Player
 {
@@ -29,6 +30,7 @@ namespace MadMantra.Player
         private bool focusLookActive;
         private Quaternion focusBaseRot;
         private Vector2 focusOffset;
+        private float stepTimer;
         private Coroutine focusRoutine;
 
         public bool CanMove { get; set; } = true;
@@ -110,6 +112,13 @@ namespace MadMantra.Player
             moveDirection.y = verticalVelocity;
 
             controller.Move(moveDirection * Time.deltaTime);
+
+            if (controller.isGrounded && (moveX != 0f || moveZ != 0f))
+            {
+                stepTimer -= Time.deltaTime;
+                if (stepTimer <= 0f) { AudioManager.Instance?.PlayFootstep(); stepTimer = 0.45f; }
+            }
+            else stepTimer = 0.1f;
         }
 
         public void SetFocus(Transform target, Action onDone = null, bool allowSubtleLook = false)

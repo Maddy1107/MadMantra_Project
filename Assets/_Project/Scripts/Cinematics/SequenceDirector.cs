@@ -31,7 +31,7 @@ namespace MadMantra.Cinematics
         [SerializeField] private float npcWalkSpeed = 2.0f;
 
         [Header("Debug & References")]
-        [SerializeField] private bool skipWakeUp = true;
+        [SerializeField] private bool skipWakeUp = false;
         [SerializeField] private PlayerController player;
         [SerializeField] private EyelidOverlay eyelids;
         [SerializeField] private LightFlicker[] flickerLights;
