@@ -159,7 +159,7 @@ namespace MadMantra.Player
             onDone?.Invoke();
         }
 
-        public void SetCursorLocked(bool locked)
+        private void SetCursorLocked(bool locked)
         {
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !locked;

@@ -9,7 +9,6 @@ namespace MadMantra.Dialogue
     {
         public static DialogueRunner Instance { get; private set; }
 
-        public bool IsPlaying { get; private set; }
         private Coroutine playRoutine;
 
         private void Awake() => Instance = this;
@@ -30,14 +29,11 @@ namespace MadMantra.Dialogue
         {
             if (playRoutine != null) StopCoroutine(playRoutine);
             playRoutine = null;
-            IsPlaying = false;
             UIManager.Instance?.HideSubtitle();
         }
 
         private IEnumerator PlayRoutine(DialogueData data, Action onComplete, Action<DialogueLine> onLineStarted)
         {
-            IsPlaying = true;
-
             foreach (DialogueLine line in data.lines)
             {
                 onLineStarted?.Invoke(line);
@@ -58,7 +54,6 @@ namespace MadMantra.Dialogue
             }
 
             UIManager.Instance?.HideSubtitle();
-            IsPlaying = false;
             playRoutine = null;
             onComplete?.Invoke();
         }

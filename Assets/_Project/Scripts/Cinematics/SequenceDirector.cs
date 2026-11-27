@@ -10,8 +10,6 @@ namespace MadMantra.Cinematics
 {
     public class SequenceDirector : MonoBehaviour
     {
-        public static SequenceDirector Instance { get; private set; }
-
         [Header("Pose & Timing")]
         [SerializeField] private Vector3 lyingCameraOffset = new Vector3(0f, -1.45f, 0.15f);
         [SerializeField] private Vector3 lyingHandOffset = new Vector3(-0.15f, 0.24f, -0.12f);
@@ -35,8 +33,6 @@ namespace MadMantra.Cinematics
         [SerializeField] private PlayerController player;
         [SerializeField] private EyelidOverlay eyelids;
         [SerializeField] private LightFlicker[] flickerLights;
-
-        private void Awake() => Instance = this;
 
         private void Start()
         {

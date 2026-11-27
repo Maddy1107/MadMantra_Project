@@ -25,29 +25,29 @@ namespace MadMantra.Puzzle
         private Queue<int> remaining;
         private bool busy;
 
-        public bool IsInPuzzleView { get; private set; }
-        public bool IsSolved { get; private set; }
+        private bool isInPuzzleView;
+        private bool isSolved;
 
         private void Awake() => ResetQueue();
         private void ResetQueue() => remaining = new Queue<int>(code);
 
-        public string GetPrompt() => IsSolved ? "Control Panel (Unlocked)" : "Press [E] to Access Control Panel";
+        public string GetPrompt() => isSolved ? "Control Panel (Unlocked)" : "Press [E] to Access Control Panel";
 
         public void Interact(PlayerInteractor interactor)
         {
-            if (IsSolved || IsInPuzzleView || busy) return;
+            if (isSolved || isInPuzzleView || busy) return;
             busy = true;
             focusCam = interactor.ActiveCamera;
             setFocus = (t, cb) => interactor.SetFocus(t, cb);
             playHandInteract = interactor.PlayHandInteract;
             UIManager.Instance?.HidePrompt();
             UIManager.Instance?.SetCrosshair(false);
-            setFocus(cameraFocusPoint, () => { IsInPuzzleView = true; busy = false; UIManager.Instance?.SetPuzzleHint(true); });
+            setFocus(cameraFocusPoint, () => { isInPuzzleView = true; busy = false; UIManager.Instance?.SetPuzzleHint(true); });
         }
 
         private void Update()
         {
-            if (!IsInPuzzleView || busy || IsSolved) return;
+            if (!isInPuzzleView || busy || isSolved) return;
 
             if (Input.GetKeyDown(KeyCode.Escape)) LeavePanel();
             else if (Input.GetMouseButtonDown(0)) CheckButtonClick();
@@ -62,9 +62,9 @@ namespace MadMantra.Puzzle
             if (btn != null) PressButton(btn.ButtonIndex);
         }
 
-        public void PressButton(int index)
+        private void PressButton(int index)
         {
-            if (IsSolved || busy || puzzleButtons[index].IsPressed) return;
+            if (isSolved || busy || puzzleButtons[index].IsPressed) return;
 
             if (playHandInteract != null)
             {
@@ -101,7 +101,7 @@ namespace MadMantra.Puzzle
 
         private IEnumerator SolveRoutine()
         {
-            IsSolved = true;
+            isSolved = true;
             AudioManager.Instance?.PlayPuzzleSolved();
             foreach (var b in puzzleButtons) b.SetSolvedState();
             UIManager.Instance?.SetPuzzleHint(false);
@@ -122,8 +122,8 @@ namespace MadMantra.Puzzle
 
         private void LeavePanel()
         {
-            if (!IsInPuzzleView) return;
-            IsInPuzzleView = false;
+            if (!isInPuzzleView) return;
+            isInPuzzleView = false;
             UIManager.Instance?.SetPuzzleHint(false);
             setFocus?.Invoke(null, () => UIManager.Instance?.SetCrosshair(true));
         }
