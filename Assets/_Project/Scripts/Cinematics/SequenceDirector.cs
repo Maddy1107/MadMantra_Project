@@ -58,7 +58,7 @@ namespace MadMantra.Cinematics
             // Place NPC inside Room 1 facing the door; remember his Room 2 spot
             Vector3 room2Pos = introNpc != null ? introNpc.transform.position : Vector3.zero;
             Quaternion room2Rot = introNpc != null ? introNpc.transform.rotation : Quaternion.identity;
-            if (introNpc != null) introNpc.transform.SetPositionAndRotation(npcIntroStartPos, Quaternion.Euler(0f, 180f, 0f));
+            if (introNpc != null) introNpc.transform.SetPositionAndRotation(npcIntroStartPos, Quaternion.identity);
 
             // Start face-down on floor with flickering lights
             mount.SetLocalPositionAndRotation(liePos, headDown);

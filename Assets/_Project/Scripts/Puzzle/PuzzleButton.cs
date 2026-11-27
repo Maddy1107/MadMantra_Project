@@ -21,6 +21,7 @@ namespace MadMantra.Puzzle
 
         public int ButtonIndex => buttonIndex;
         public bool IsPressed { get; private set; }
+        public Vector3 PressPosition => movingMesh != null ? movingMesh.position : transform.position;
 
         private void Awake()
         {

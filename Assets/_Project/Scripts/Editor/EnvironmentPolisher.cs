@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
+using MadMantra.Environment;
 using MadMantra.NPC;
 
 namespace MadMantra.Editor
@@ -188,6 +189,101 @@ namespace MadMantra.Editor
             if (clips == null || clips.Length == 0) clips = imp.defaultClipAnimations;
             for (int i = 0; i < clips.Length; i++) clips[i].loopTime = loop;
             imp.clipAnimations = clips;
+        }
+
+        [MenuItem("MadMantra/Setup Door Unlock Key")]
+        public static void SetupDoorUnlockKey()
+        {
+            const string doorPrefabPath = "Assets/_Project/Prefabs/Interactables/SecurityDoor.prefab";
+            const string cabinetPrefabPath = "Assets/_Project/Prefabs/Interactables/Cabinet.prefab";
+            Material keyMat = AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath("4525e712f9254ce419ddd394ca797cb5"));
+            Material lockMat = AssetDatabase.LoadAssetAtPath<Material>(MatDir + "M_DoorFrame.mat");
+
+            // 1. Add LockCylinder + UnlockKey to SecurityDoor.prefab
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(doorPrefabPath);
+            try
+            {
+                Transform hinge = prefabRoot.transform.Find("Hinge");
+                if (hinge == null) { Debug.LogError("[EnvironmentPolisher] Hinge not found in SecurityDoor.prefab"); return; }
+
+                Transform oldLock = hinge.Find("LockCylinder");
+                if (oldLock != null) Object.DestroyImmediate(oldLock.gameObject);
+                Transform oldKey = hinge.Find("UnlockKey");
+                if (oldKey != null) Object.DestroyImmediate(oldKey.gameObject);
+
+                GameObject lockCyl = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                lockCyl.name = "LockCylinder";
+                lockCyl.transform.SetParent(hinge, false);
+                lockCyl.transform.localPosition = new Vector3(1.02f, 1.05f, -0.085f);
+                lockCyl.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                lockCyl.transform.localScale = new Vector3(0.075f, 0.018f, 0.075f);
+                Object.DestroyImmediate(lockCyl.GetComponent<Collider>());
+                if (lockMat != null) lockCyl.GetComponent<Renderer>().sharedMaterial = lockMat;
+
+                GameObject keyRoot = new GameObject("UnlockKey");
+                keyRoot.transform.SetParent(hinge, false);
+                keyRoot.transform.localPosition = new Vector3(1.02f, 1.05f, -0.105f);
+                keyRoot.transform.localRotation = Quaternion.identity;
+                BuildKeyVisual(keyRoot.transform, keyMat);
+                keyRoot.SetActive(false);
+
+                Door door = hinge.GetComponent<Door>();
+                if (door != null)
+                {
+                    SerializedObject so = new SerializedObject(door);
+                    so.FindProperty("lockMode").enumValueIndex = (int)LockMode.Keycard;
+                    so.FindProperty("canClose").boolValue = true;
+                    so.FindProperty("unlockKeyVisual").objectReferenceValue = keyRoot.transform;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, doorPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
+
+            // 2. Apply the exact same key model to SecurityKey inside Cabinet.prefab
+            GameObject cabRoot = PrefabUtility.LoadPrefabContents(cabinetPrefabPath);
+            try
+            {
+                Transform keyPickup = cabRoot.transform.Find("SecurityKey");
+                if (keyPickup != null)
+                {
+                    // Hide old keycard box renderer (keep its collider for easy pickup raycast)
+                    foreach (Transform child in keyPickup)
+                    {
+                        if (child.name == "KeyModel") Object.DestroyImmediate(child.gameObject);
+                        else
+                        {
+                            Renderer r = child.GetComponent<Renderer>();
+                            if (r != null) r.enabled = false;
+                        }
+                    }
+
+                    GameObject keyModel = new GameObject("KeyModel");
+                    keyModel.transform.SetParent(keyPickup, false);
+                    keyModel.transform.localPosition = new Vector3(0f, 0f, 0.03f);
+                    keyModel.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                    keyModel.transform.localScale = Vector3.one * 1.35f;
+                    BuildKeyVisual(keyModel.transform, keyMat);
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(cabRoot, cabinetPrefabPath);
+                Debug.Log("[EnvironmentPolisher] Applied matching Key model to both SecurityDoor.prefab and Cabinet.prefab!");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(cabRoot);
+            }
+        }
+
+        private static void BuildKeyVisual(Transform parent, Material keyMat)
+        {
+            CreateBox("KeyBow", parent, new Vector3(0f, 0f, -0.075f), new Vector3(0.018f, 0.075f, 0.06f), keyMat);
+            CreateBox("KeyBlade", parent, new Vector3(0f, 0f, 0.005f), new Vector3(0.012f, 0.022f, 0.12f), keyMat);
+            CreateBox("KeyTooth", parent, new Vector3(0f, -0.018f, 0.042f), new Vector3(0.012f, 0.02f, 0.022f), keyMat);
         }
 
         [MenuItem("MadMantra/Apply 3D Hand to Player")]

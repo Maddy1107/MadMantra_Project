@@ -19,6 +19,7 @@ namespace MadMantra.Puzzle
         [SerializeField] private UnityEvent onSolved;
 
         private Action<Transform, Action> setFocus;
+        private Action<Vector3?, Action> playHandInteract;
         private Camera focusCam;
         private Queue<int> remaining;
         private bool busy;
@@ -37,6 +38,7 @@ namespace MadMantra.Puzzle
             busy = true;
             focusCam = interactor.ActiveCamera;
             setFocus = interactor.SetFocus;
+            playHandInteract = interactor.PlayHandInteract;
             UIManager.Instance?.HidePrompt();
             UIManager.Instance?.SetCrosshair(false);
             setFocus(cameraFocusPoint, () => { IsInPuzzleView = true; busy = false; UIManager.Instance?.SetPuzzleHint(true); });
@@ -63,6 +65,20 @@ namespace MadMantra.Puzzle
         {
             if (IsSolved || busy || puzzleButtons[index].IsPressed) return;
 
+            if (playHandInteract != null)
+            {
+                busy = true;
+                playHandInteract(puzzleButtons[index].PressPosition, () => ApplyButtonPress(index));
+            }
+            else
+            {
+                ApplyButtonPress(index);
+            }
+        }
+
+        private void ApplyButtonPress(int index)
+        {
+            busy = false;
             puzzleButtons[index].Press();
             if (index != remaining.Peek()) { StartCoroutine(FailRoutine()); return; }
 

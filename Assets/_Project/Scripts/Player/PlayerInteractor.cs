@@ -40,7 +40,7 @@ namespace MadMantra.Player
         public Camera ActiveCamera => player != null && player.PlayerCamera != null ? player.PlayerCamera : (GetComponent<Camera>() ?? Camera.main);
         public bool HasKeycard { get => player != null && player.HasKeycard; set { if (player != null) player.HasKeycard = value; } }
         public void SetFocus(Transform target, Action onDone = null) => player?.SetFocus(target, onDone);
-        public void PlayHandInteract() => player?.Hand?.PlayInteractAnimation();
+        public void PlayHandInteract(Vector3? worldPoint = null, Action onTouch = null) => player?.Hand?.PlayInteractAnimation(worldPoint, onTouch);
 
         private void CheckRaycast()
         {
