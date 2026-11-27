@@ -891,17 +891,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Audio.AudioManager
   ambientSource: {fileID: 189245003}
   sfxSource: {fileID: 189245005}
-  ambientHum: {fileID: 8300000, guid: 2a8e0bf172bf4494a8a92ad020a00282, type: 3}
-  lightFlicker: {fileID: 8300000, guid: e5d0cc328b8d24f4b92fe5a83b2adc91, type: 3}
-  footstep: {fileID: 8300000, guid: d936c34c3cdc22441a66358c00cb5f3f, type: 3}
-  buttonClick: {fileID: 8300000, guid: aeff6492d1925c74aa5971acb83739e4, type: 3}
-  puzzleSolved: {fileID: 8300000, guid: fa530bf66f43e0b4286778e443441534, type: 3}
-  puzzleFail: {fileID: 8300000, guid: 2caaaea234bbd5b44b8aaea9fa4a2851, type: 3}
-  keyPickup: {fileID: 8300000, guid: a03ac6aac495e66449dfbc7ea73b3058, type: 3}
-  doorLocked: {fileID: 8300000, guid: 0b67c7472a7077646b609114c3592484, type: 3}
-  doorUnlock: {fileID: 8300000, guid: df341e1fc542c0b47bfe1b083a6a2c92, type: 3}
-  doorOpen: {fileID: 8300000, guid: cb329b764e883bb439a1d03b47001e25, type: 3}
-  typewriterBlip: {fileID: 8300000, guid: c9e011faef6e42d4db99566b06c84e3d, type: 3}
+  ambientHum: {fileID: 8300000, guid: 3f4bbd3e5f4985747ad48ad86b5f6240, type: 3}
+  lightFlicker: {fileID: 8300000, guid: ceb770b13feb0264cb23547362b0e05d, type: 3}
+  footstep: {fileID: 8300000, guid: 5a1238506c6c3324abbb3d584f9a688d, type: 3}
+  buttonClick: {fileID: 8300000, guid: 3549c7ffd1b5e4745a9be150a0a38350, type: 3}
+  puzzleSolved: {fileID: 8300000, guid: 979ea20cc022ad441a52ac819b7a7748, type: 3}
+  puzzleFail: {fileID: 8300000, guid: 86d417b6b061fc94fa0932fe932831bd, type: 3}
+  keyPickup: {fileID: 8300000, guid: 3e47cedefef100f42b00ae879e449924, type: 3}
+  doorLocked: {fileID: 8300000, guid: fa36d8c1418f06f4aa13bbb1d05e2241, type: 3}
+  doorUnlock: {fileID: 8300000, guid: 54df38ff613f3a543b2f101d74af2cd8, type: 3}
+  doorOpen: {fileID: 8300000, guid: 6440ccb82fa63d84b8730e2a8c3d2e03, type: 3}
+  typewriterBlip: {fileID: 8300000, guid: 8b67d739291ae8548890830bb8255c83, type: 3}
 --- !u!82 &189245003
 AudioSource:
   m_ObjectHideFlags: 0
