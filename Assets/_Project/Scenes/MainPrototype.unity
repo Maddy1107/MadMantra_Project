@@ -7737,7 +7737,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2052505230832869431, guid: 3b9455a70f6477b4783f7310ee5a9305, type: 3}
       propertyPath: lockMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2618239996112236840, guid: 3b9455a70f6477b4783f7310ee5a9305, type: 3}
       propertyPath: m_Name
