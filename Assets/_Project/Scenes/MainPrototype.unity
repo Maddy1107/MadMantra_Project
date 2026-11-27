@@ -1140,7 +1140,7 @@ MonoBehaviour:
   npcIntroStartPos: {x: 0, y: 0, z: 3.6}
   npcThroughDoorPos: {x: 0, y: 0, z: 6.2}
   npcWalkSpeed: 2
-  skipWakeUp: 0
+  skipWakeUp: 1
   player: {fileID: 41347021}
   eyelids: {fileID: 3488377918603388488}
   flickerLights:
@@ -1857,26 +1857,6 @@ Transform:
   - {fileID: 1010875837}
   m_Father: {fileID: 1619662660}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8500000000000000001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 531251967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f47c7daecad43c4ca9e88c2d03f528f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
-  openAngle: -90
-  openDuration: 0.9
-  lockMode: 0
-  canClose: 1
-  lockedMessage: Locked
-  onOpened:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &561275860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7207,6 +7187,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7120769572951755521, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8379907936096973543, guid: 05745e96792d0be4d869f2711471d4b9, type: 3}
       propertyPath: m_Name
       value: KeyCabinet
@@ -7370,6 +7354,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1561924578749464666, guid: 73ac5e8b08d1d87488d1425fafdae899, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1561924578749464666, guid: 73ac5e8b08d1d87488d1425fafdae899, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3247122663145619679, guid: 73ac5e8b08d1d87488d1425fafdae899, type: 3}
       propertyPath: m_Name
       value: --- UI CANVAS ---
@@ -7478,6 +7470,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1126437792}
     m_Modifications:
+    - target: {fileID: 418868159016064971, guid: 3b9455a70f6477b4783f7310ee5a9305, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 828010158377410851, guid: 3b9455a70f6477b4783f7310ee5a9305, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -7647,11 +7643,27 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b83debca7289dde44bb94cd28ce0bb27, type: 3}
---- !u!4 &4566718136457708579 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7271383096692990443, guid: b83debca7289dde44bb94cd28ce0bb27, type: 3}
-  m_PrefabInstance: {fileID: 4566718136457708574}
+--- !u!114 &8500000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531251967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f47c7daecad43c4ca9e88c2d03f528f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MadMantra.Environment.Door
+  openAngle: -90
+  openDuration: 0.9
+  lockMode: 0
+  canClose: 1
+  lockedMessage: Locked
+  unlockKeyVisual: {fileID: 0}
+  onOpened:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

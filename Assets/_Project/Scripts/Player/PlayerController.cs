@@ -26,6 +26,9 @@ namespace MadMantra.Player
         private Vector3 savedMountPos;
         private Quaternion savedMountRot;
         private bool inFocus;
+        private bool focusLookActive;
+        private Quaternion focusBaseRot;
+        private Vector2 focusOffset;
         private Coroutine focusRoutine;
 
         public bool CanMove { get; set; } = true;
@@ -65,18 +68,24 @@ namespace MadMantra.Player
 
         private void HandleLook()
         {
-            if (!CanLook) return;
+            if (!CanLook && !focusLookActive) return;
 
             float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
             float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-            transform.Rotate(Vector3.up * mouseX);
-
-            pitch = Mathf.Clamp(pitch - mouseY, minPitch, maxPitch);
-            if (cameraMount != null)
+            if (focusLookActive)
             {
-                cameraMount.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+                focusOffset.x = Mathf.Clamp(focusOffset.x + mouseX * 0.5f, -15f, 15f);
+                focusOffset.y = Mathf.Clamp(focusOffset.y - mouseY * 0.5f, -10f, 10f);
+                if (mouseX == 0f && mouseY == 0f)
+                    focusOffset = Vector2.Lerp(focusOffset, Vector2.zero, 3f * Time.deltaTime);
+                cameraMount.localRotation = focusBaseRot * Quaternion.Euler(focusOffset.y, focusOffset.x, 0f);
+                return;
             }
+
+            transform.Rotate(Vector3.up * mouseX);
+            pitch = Mathf.Clamp(pitch - mouseY, minPitch, maxPitch);
+            if (cameraMount != null) cameraMount.localRotation = Quaternion.Euler(pitch, 0f, 0f);
         }
 
         private void HandleMovement()
@@ -103,26 +112,29 @@ namespace MadMantra.Player
             controller.Move(moveDirection * Time.deltaTime);
         }
 
-        public void SetFocus(Transform target, Action onDone = null)
+        public void SetFocus(Transform target, Action onDone = null, bool allowSubtleLook = false)
         {
             if (cameraMount == null) return;
             bool enter = target != null;
+            focusLookActive = false;
+            focusOffset = Vector2.zero;
+
             if (enter && !inFocus)
             {
                 savedMountPos = cameraMount.localPosition;
                 savedMountRot = cameraMount.localRotation;
                 CanMove = CanLook = false;
-                SetCursorLocked(false);
+                SetCursorLocked(allowSubtleLook);
             }
             inFocus = enter;
 
             Vector3 toPos = enter ? cameraMount.parent.InverseTransformPoint(target.position) : savedMountPos;
             Quaternion toRot = enter ? Quaternion.Inverse(cameraMount.parent.rotation) * target.rotation : savedMountRot;
             if (focusRoutine != null) StopCoroutine(focusRoutine);
-            focusRoutine = StartCoroutine(BlendCamera(toPos, toRot, !enter, onDone));
+            focusRoutine = StartCoroutine(BlendCamera(toPos, toRot, !enter, enter && allowSubtleLook, onDone));
         }
 
-        private IEnumerator BlendCamera(Vector3 toPos, Quaternion toRot, bool restoreControl, Action onDone)
+        private IEnumerator BlendCamera(Vector3 toPos, Quaternion toRot, bool restoreControl, bool enableFocusLook, Action onDone)
         {
             Vector3 fromPos = cameraMount.localPosition;
             Quaternion fromRot = cameraMount.localRotation;
@@ -133,6 +145,7 @@ namespace MadMantra.Player
                 yield return null;
             }
             cameraMount.SetLocalPositionAndRotation(toPos, toRot);
+            if (enableFocusLook) { focusBaseRot = toRot; focusLookActive = true; }
             if (restoreControl) { SetCursorLocked(true); CanMove = CanLook = true; }
             onDone?.Invoke();
         }

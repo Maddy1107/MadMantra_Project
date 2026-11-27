@@ -12,6 +12,7 @@ namespace MadMantra.NPC
     public class NPCController : MonoBehaviour, IInteractable
     {
         [SerializeField] private Animator animator;
+        [SerializeField] private NPCHeadLook headLook;
         [SerializeField] private Transform dialogueFocusPoint;
         [SerializeField] private DialogueData dialogue;
         [SerializeField] private Door exitDoor;
@@ -31,7 +32,7 @@ namespace MadMantra.NPC
             UIManager.Instance?.HidePrompt();
             UIManager.Instance?.SetCrosshair(false);
             exitFocus = () => interactor.SetFocus(null, () => UIManager.Instance?.SetCrosshair(true));
-            interactor.SetFocus(dialogueFocusPoint, OnFocusArrived);
+            interactor.SetFocus(dialogueFocusPoint, OnFocusArrived, true);
         }
 
         private void OnFocusArrived()
@@ -50,6 +51,7 @@ namespace MadMantra.NPC
 
         private IEnumerator DisappointedAndExitRoutine()
         {
+            if (headLook != null) headLook.IsTracking = false;
             if (animator != null) animator.SetTrigger("Disappointed");
             yield return new WaitForSeconds(disappointedDuration);
 
@@ -81,6 +83,7 @@ namespace MadMantra.NPC
         public IEnumerator WalkTo(Vector3 targetPos, float speed = 2.0f)
         {
             targetPos.y = transform.position.y;
+            if (headLook != null) headLook.IsTracking = false;
             if (animator != null) animator.SetBool("IsWalking", true);
 
             while (transform.position != targetPos)
@@ -90,6 +93,7 @@ namespace MadMantra.NPC
             }
 
             if (animator != null) animator.SetBool("IsWalking", false);
+            if (headLook != null && !hasTalked) headLook.IsTracking = true;
         }
 
         public IEnumerator TurnTo(Quaternion targetRot, float degreesPerSec = 240f)

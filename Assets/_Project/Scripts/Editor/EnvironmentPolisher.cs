@@ -63,6 +63,9 @@ namespace MadMantra.Editor
             ctrl.AddParameter("IsWalking", AnimatorControllerParameterType.Bool);
             ctrl.AddParameter("Talk", AnimatorControllerParameterType.Trigger);
             ctrl.AddParameter("Disappointed", AnimatorControllerParameterType.Trigger);
+            AnimatorControllerLayer[] layers = ctrl.layers;
+            layers[0].iKPass = true;
+            ctrl.layers = layers;
             AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
 
             AnimatorState idleState = sm.AddState("Idle");
@@ -100,6 +103,7 @@ namespace MadMantra.Editor
             AddBoolTransition(disappointedState, walkState, "IsWalking", true);
 
             EditorUtility.SetDirty(ctrl);
+            AssetDatabase.SaveAssets();
 
             // 4. Swap placeholder body in NPC_Survivor.prefab with Mixamo character
             GameObject npcFbx = AssetDatabase.LoadAssetAtPath<GameObject>(idlePath);
@@ -125,11 +129,15 @@ namespace MadMantra.Editor
                 anim.avatar = npcAvatar;
                 anim.applyRootMotion = false;
 
+                NPCHeadLook headLook = inst.GetComponent<NPCHeadLook>();
+                if (headLook == null) headLook = inst.AddComponent<NPCHeadLook>();
+
                 NPCController npcCtrl = prefabRoot.GetComponent<NPCController>();
                 if (npcCtrl != null)
                 {
                     SerializedObject so = new SerializedObject(npcCtrl);
                     so.FindProperty("animator").objectReferenceValue = anim;
+                    so.FindProperty("headLook").objectReferenceValue = headLook;
                     so.ApplyModifiedPropertiesWithoutUndo();
                 }
 
@@ -227,6 +235,13 @@ namespace MadMantra.Editor
                 BuildKeyVisual(keyRoot.transform, keyMat);
                 keyRoot.SetActive(false);
 
+                Transform oldFocus = prefabRoot.transform.Find("UnlockFocusPoint");
+                if (oldFocus != null) Object.DestroyImmediate(oldFocus.gameObject);
+                GameObject focusGo = new GameObject("UnlockFocusPoint");
+                focusGo.transform.SetParent(prefabRoot.transform, false);
+                focusGo.transform.localPosition = new Vector3(0.44f, 1.08f, -0.58f);
+                focusGo.transform.localRotation = Quaternion.Euler(3f, 0f, 0f);
+
                 Door door = hinge.GetComponent<Door>();
                 if (door != null)
                 {
@@ -234,6 +249,7 @@ namespace MadMantra.Editor
                     so.FindProperty("lockMode").enumValueIndex = (int)LockMode.Keycard;
                     so.FindProperty("canClose").boolValue = true;
                     so.FindProperty("unlockKeyVisual").objectReferenceValue = keyRoot.transform;
+                    so.FindProperty("unlockFocusPoint").objectReferenceValue = focusGo.transform;
                     so.ApplyModifiedPropertiesWithoutUndo();
                 }
 

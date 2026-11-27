@@ -17,6 +17,7 @@ namespace MadMantra.Environment
         [SerializeField] private bool canClose = true;
         [SerializeField] private string lockedMessage = "Locked";
         [SerializeField] private Transform unlockKeyVisual;
+        [SerializeField] private Transform unlockFocusPoint;
         [SerializeField] private UnityEvent onOpened;
 
         private Quaternion closedRot;
@@ -57,7 +58,7 @@ namespace MadMantra.Environment
                 }
                 if (unlockKeyVisual != null)
                 {
-                    StartCoroutine(UnlockRoutine());
+                    StartCoroutine(UnlockRoutine(interactor));
                     return;
                 }
                 lockMode = LockMode.Unlocked;
@@ -67,10 +68,18 @@ namespace MadMantra.Environment
             if (IsOpen) CloseDoor(); else OpenDoor();
         }
 
-        private IEnumerator UnlockRoutine()
+        private IEnumerator UnlockRoutine(PlayerInteractor interactor)
         {
             isUnlocking = true;
             UIManager.Instance?.HidePrompt();
+
+            if (unlockFocusPoint != null)
+            {
+                UIManager.Instance?.SetCrosshair(false);
+                bool arrived = false;
+                interactor.SetFocus(unlockFocusPoint, () => arrived = true);
+                yield return new WaitUntil(() => arrived);
+            }
 
             Vector3 inPos = unlockKeyVisual.localPosition;
             Vector3 outPos = inPos - Vector3.forward * 0.18f;
@@ -87,6 +96,9 @@ namespace MadMantra.Environment
 
             unlockKeyVisual.SetLocalPositionAndRotation(inPos, startRot);
             unlockKeyVisual.gameObject.SetActive(false);
+
+            if (unlockFocusPoint != null)
+                interactor.SetFocus(null, () => UIManager.Instance?.SetCrosshair(true));
 
             lockMode = LockMode.Unlocked;
             isUnlocking = false;

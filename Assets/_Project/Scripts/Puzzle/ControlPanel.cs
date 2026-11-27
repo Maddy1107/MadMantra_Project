@@ -37,7 +37,7 @@ namespace MadMantra.Puzzle
             if (IsSolved || IsInPuzzleView || busy) return;
             busy = true;
             focusCam = interactor.ActiveCamera;
-            setFocus = interactor.SetFocus;
+            setFocus = (t, cb) => interactor.SetFocus(t, cb);
             playHandInteract = interactor.PlayHandInteract;
             UIManager.Instance?.HidePrompt();
             UIManager.Instance?.SetCrosshair(false);
